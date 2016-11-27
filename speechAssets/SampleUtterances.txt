@@ -1,0 +1,24 @@
+Departures get next departures for route {RouteNumber}
+Departures get the next departures for route {RouteNumber}
+Departures get next departure for route {RouteNumber}
+Departures get the next departure for route {RouteNumber}
+Departures get the schedule for the {RouteNumber}
+Departures get the schedule for route {RouteNumber}
+Departures get the {RouteNumber} schedule
+Departures upcoming departures for route {RouteNumber}
+Departures upcoming departures for the {RouteNumber}
+Departures {RouteNumber}
+
+HearMore yes
+HearMore yep
+HearMore yeah
+HearMore sure
+HearMore yes please
+HearMore affirmative
+HearMore please
+
+DontHearMore no
+DontHearMore nope
+DontHearMore no thank you
+DontHearMore not now
+DontHearMore negative

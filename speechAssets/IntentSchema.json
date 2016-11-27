@@ -1,0 +1,28 @@
+{
+  "intents": [
+    {
+      "intent": "Departures",
+      "slots": [
+        {
+          "name": "RouteNumber",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
+    },
+    {
+      "intent": "HearMore"
+    },
+    {
+      "intent": "DontHearMore"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    }
+  ]
+}
