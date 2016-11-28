@@ -7,6 +7,14 @@ Departures get the schedule for route {RouteNumber}
 Departures get the {RouteNumber} schedule
 Departures upcoming departures for route {RouteNumber}
 Departures upcoming departures for the {RouteNumber}
+Departures when the next {RouteNumber} is coming
+Departures when the next {RouteNumber} is arriving
+Departures when the next {RouteNumber} comes
+Departures when the next {RouteNumber} arrives
+Departures when is the next {RouteNumber} departure
+Departures when is the next {RouteNumber} 
+Departures when does the next {RouteNumber} come
+Departures when does the next {RouteNumber} arrive
 Departures {RouteNumber}
 
 HearMore yes
