@@ -13,13 +13,7 @@
 var request = require('request');
 
 var baseUrl = 'http://www3.septa.org/hackathon/';
-var userLat = 39.951728;
-var userLng = -75.212593;
 var resultQty = 9;  // The number of results to request in a query
-
-getBusTrolleySchedule(34, userLat, userLng, 'i', function(schedule) {
-    console.log(schedule);
-});
 
 /**
  * Gets closest stop ID based on route number and lat/long
