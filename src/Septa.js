@@ -15,9 +15,10 @@ var request = require('request');
 var baseUrl = 'http://www3.septa.org/hackathon/';
 var userLat = 39.951728;
 var userLng = -75.212593;
+var resultQty = 9;  // The number of results to request in a query
 
-getClosestStopId(34, userLat, userLng, function(resp) {
-    console.log(resp);
+getBusTrolleySchedule(34, userLat, userLng, 'i', function(schedule) {
+    console.log(schedule);
 });
 
 /**
@@ -26,7 +27,7 @@ getClosestStopId(34, userLat, userLng, function(resp) {
  * @param routeNumber The route number or letter (must be all caps)
  * @param lat The latitude
  * @param lng The longitude
- * @param stopId The callback stop ID, or null if there is an error
+ * @callback stopId The callback stop ID, or null if there is an error
  */
 function getClosestStopId(routeNumber, lat, lng, stopId) {
     // Generate request URL
@@ -57,14 +58,87 @@ function getClosestStopId(routeNumber, lat, lng, stopId) {
 }
 
 /**
+ * Gets the schedule for the closest stop on a given route
+ * 
+ * @param routeNumber The route number or letter (must be all caps)
+ * @param lat The latitude
+ * @param lng The longitude
+ * @param dir The direction, 'i' for inbound, 'o' for outbound
+ * @callback schedule The schedule object containing 'times' and 'stopName'
+ */
+function getBusTrolleySchedule(routeNumber, lat, lng, dir, schedule) {
+    // Get the stop ID
+    getClosestStopId(routeNumber, lat, lng, function(stopId) {
+        // Generate request URL
+        var reqUrl = baseUrl + '/BusSchedules/?req1=' + stopId + '&req2=' + routeNumber +
+            '&req3=' + dir + '&req6=' + resultQty;
+
+        // Get the schedule for the stop and route
+        httpGet(reqUrl, function(apiResult) {
+            // Parse into new JSON output
+            var schedObj = JSON.parse(apiResult);
+            var routeArr = schedObj[routeNumber];
+
+            // Get the stop name
+            var stopName = routeArr[0].StopName;
+            console.log(stopName);
+            
+            // Iterate through all the times, recording each in an array
+            var times = new Array(resultQty);
+            for (var i = 0; i < resultQty; i++) {   
+                times[i] = routeArr[i].date;
+            }
+
+            // Convert times to JSON 24h format 
+            var times24h = new Array(resultQty);
+            for (var i = 0; i < resultQty; i++) {
+                time24H(times[i], function(time24) {
+                    times24h[i] = time24;
+                });
+            }
+
+            // Generate and output schedule
+            var obj = {};
+            obj['stopName'] = stopName;
+            obj['times'] = times24h;
+            schedule(obj);
+        });
+    })
+}
+
+/**
  * Makes an HTTP GET request
  * 
  * @param requestUrl The request URL
- * @param callback The JSON response callback, null if error
+ * @callback callback The JSON response callback, null if error
  */
 function httpGet(requestUrl, callback) {
     request(requestUrl, function(error, response, body) {
         if (!error && response.statusCode == 200) callback(body);
         else callback(null);
     });
+}
+
+/**
+ * Parses an AM/PM time string into JSON with 24h format
+ * 
+ * @param amPmTime The AM/PM time, e.g. '9:31p'
+ * @callback callback The output time, e.g. {'hh': 21, 'mm': 31}
+ */
+function time24H(amPmTime, callback) {
+    var hh, mm;
+    if (amPmTime.length == 5) {
+        hh = parseInt(amPmTime.substring(0,1));
+        mm = parseInt(amPmTime.substring(2,4));
+    } else if (amPmTime.length == 6) {
+        hh = parseInt(amPmTime.substring(0,2));
+        mm = parseInt(amPmTime.substring(3,5)); 
+    }
+
+    if (amPmTime.includes('p')) hh += 12; // if PM, add 12
+
+    var obj = {};
+    obj['hh'] = hh;
+    obj['mm'] = mm;
+    callback(obj);
 }
