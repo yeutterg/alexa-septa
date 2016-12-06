@@ -186,13 +186,17 @@ function getDepartures(intent, session, response) {
 
         var stopName = schedule.stopName;
 
-        speechText += "The next three times for route " routeNumberSlot + " at " + stopName + " are: " + 
+        speechText += "The next three times for route " + routeNumberSlot + " at " + stopName + " are: " + 
             "<say-as interpret-as=\"time\">" + schedule.times[0].hh + "\'" + schedule.times[0].mm + "</say-as>, " + 
             "<say-as interpret-as=\"time\">" + schedule.times[1].hh + "\'" + schedule.times[1].mm + "</say-as>, and " +
-            "<say-as interpret-as=\"time\">" + schedule.times[2].hh + "\'" + schedule.times[2].mm + "</say-as>. "
-          
+            "<say-as interpret-as=\"time\">" + schedule.times[2].hh + "\'" + schedule.times[2].mm + "</say-as>. ";
 
-
+        speechOutput = {
+            speech: speechText,
+            type: AlexaSkill.speechOutputType.PLAIN_TEXT
+        };
+        response.tell(speechOutput);
+        return;
     });
 
     // // Find the lookup word for the given category.
