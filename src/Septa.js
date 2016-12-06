@@ -10,10 +10,16 @@
 
 'use strict';
 
-var request = require('request');
+var http = require('http');
 
-var baseUrl = 'http://www3.septa.org/hackathon/';
+var baseUrl = 'www3.septa.org';
+var basePath = '/hackathon/';
 var resultQty = 9;  // The number of results to request in a query
+
+// Test function
+// getBusTrolleySchedule(34, 39.951728, -75.212593, 1, function(s) {
+//     console.log(s);
+// })
 
 /**
  * Gets closest stop ID based on route number and lat/long
@@ -25,10 +31,10 @@ var resultQty = 9;  // The number of results to request in a query
  */
 function getClosestStopId(routeNumber, lat, lng, stopId) {
     // Generate request URL
-    var reqUrl = baseUrl + '/Stops/' + routeNumber;
+    var reqUrl = basePath + '/Stops/' + routeNumber;
 
     // Get all stops for the route
-    httpGet(reqUrl, function(resp) {
+    httpGet(baseUrl, reqUrl, function(resp) {
         if (resp) {
             // Parse the response
             var stopObj = JSON.parse(resp);
@@ -64,18 +70,17 @@ function getBusTrolleySchedule(routeNumber, lat, lng, dir, schedule) {
     // Get the stop ID
     getClosestStopId(routeNumber, lat, lng, function(stopId) {
         // Generate request URL
-        var reqUrl = baseUrl + '/BusSchedules/?req1=' + stopId + '&req2=' + routeNumber +
+        var reqUrl = basePath + '/BusSchedules/?req1=' + stopId + '&req2=' + routeNumber +
             '&req3=' + dir + '&req6=' + resultQty;
 
         // Get the schedule for the stop and route
-        httpGet(reqUrl, function(apiResult) {
+        httpGet(baseUrl, reqUrl, function(apiResult) {
             // Parse into new JSON output
             var schedObj = JSON.parse(apiResult);
             var routeArr = schedObj[routeNumber];
 
             // Get the stop name
             var stopName = routeArr[0].StopName;
-            console.log(stopName);
             
             // Iterate through all the times, recording each in an array
             var times = new Array(resultQty);
@@ -103,13 +108,25 @@ function getBusTrolleySchedule(routeNumber, lat, lng, dir, schedule) {
 /**
  * Makes an HTTP GET request
  * 
- * @param requestUrl The request URL
+ * @param requestHost The request host, e.g. 'example.com'
+ * @param requestPath The request path, e.g. '/api'
  * @callback callback The JSON response callback, null if error
  */
-function httpGet(requestUrl, callback) {
-    request(requestUrl, function(error, response, body) {
-        if (!error && response.statusCode == 200) callback(body);
-        else callback(null);
+function httpGet(requestHost, requestPath, callback) {
+    return http.get({
+        host: requestHost,
+        path: requestPath
+    }, function(response) {
+        var body = '';
+        response.on('data', function(data) {
+            body += data;
+        });
+        response.on('end', function() {
+            callback(body);
+        });
+        response.on('error', function() {
+            callback(null);
+        })
     });
 }
 
