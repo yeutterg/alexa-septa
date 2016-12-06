@@ -181,7 +181,7 @@ function getDepartures(intent, session, response) {
     var routeNumberSlot = intent.slots.RouteNumber.value;
 
     // Get the next set of departures for the location
-    septa.getBusTrolleySchedule(routeNumberSlot, userLat, userLng, 'i', function(schedule) {
+    septa.getBusTrolleySchedule(routeNumberSlot, userLat, userLng, 1, function(schedule) {
         console.log(schedule);
 
         var stopName = schedule.stopName;
