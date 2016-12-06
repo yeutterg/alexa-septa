@@ -70,12 +70,12 @@ var AlexaSkill = require('./AlexaSkill');
 /**
  * The SEPTA API
  */
-var septa = require('./Septa.js');
+var septa = require('./Septa');
 
 /**
  * SeptaSchedules is a child of AlexaSkill.
  */
-var SeptaSchedules = function () {
+var SeptaSchedules = function() {
     AlexaSkill.call(this, APP_ID);
 };
 
@@ -111,9 +111,9 @@ SeptaSchedules.prototype.intentHandlers = {
         getDepartures(intent, session, response);
     },
 
-    "HearMore": function (intent, session, response) {
-        getNextPageOfItems(intent, session, response);
-    },
+    // "HearMore": function (intent, session, response) {
+    //     getNextPageOfItems(intent, session, response);
+    // },
 
     "DontHearMore": function (intent, session, response) {
         response.tell("");
@@ -178,7 +178,7 @@ function getDepartures(intent, session, response) {
     //     return;
     // }
 
-    var routeNumberSlot = intent.slots.RouteNumber;
+    var routeNumberSlot = intent.slots.RouteNumber.value;
 
     // Get the next set of departures for the location
     septa.getBusTrolleySchedule(routeNumberSlot, userLat, userLng, 'i', function(schedule) {
@@ -186,10 +186,10 @@ function getDepartures(intent, session, response) {
 
         var stopName = schedule.stopName;
 
-        speechText += "The next three times for route " + routeNumberSlot + " at " + stopName + " are: " + 
-            "<say-as interpret-as=\"time\">" + schedule.times[0].hh + "\'" + schedule.times[0].mm + "</say-as>, " + 
-            "<say-as interpret-as=\"time\">" + schedule.times[1].hh + "\'" + schedule.times[1].mm + "</say-as>, and " +
-            "<say-as interpret-as=\"time\">" + schedule.times[2].hh + "\'" + schedule.times[2].mm + "</say-as>. ";
+        speechText += 'Route ' + routeNumberSlot + ' departs from ' + stopName + ' at ' + 
+             + schedule.times[0].hh + ':' + schedule.times[0].mm + ", "
+             + schedule.times[1].hh + ':' + schedule.times[1].mm + ", and "
+             + schedule.times[2].hh + ':' + schedule.times[2].mm;
 
         speechOutput = {
             speech: speechText,
@@ -300,72 +300,72 @@ function getDepartures(intent, session, response) {
 /**
  * Gets the next page of items based on information saved in the session.
  */
-function getNextPageOfItems(intent, session, response) {
-    var sessionAttributes = session.attributes,
-        current = sessionAttributes[KEY_CURRENT_INDEX],
-        speechText = "",
-        speechOutput,
-        repromptOutput;
+// function getNextPageOfItems(intent, session, response) {
+//     var sessionAttributes = session.attributes,
+//         current = sessionAttributes[KEY_CURRENT_INDEX],
+//         speechText = "",
+//         speechOutput,
+//         repromptOutput;
 
-    if (current) {
-        // Iterate through the session attributes to create the next n results for the user.
-        for (var i = 0; i < PAGINATION_SIZE; i++) {
-            if (sessionAttributes[current]) {
-                var numberInList = current + 1;
-                if (current < MAX_ITEMS - 1) {
-                    speechText += "<say-as interpret-as=\"ordinal\">" + numberInList + "</say-as>. "
-                        + sessionAttributes[current] + ". ";
-                } else {
-                    speechText += "And the <say-as interpret-as=\"ordinal\">" + numberInList + "</say-as> top seller is. "
-                        + sessionAttributes[current] + ". Those were the 10 top sellers in Amazon's "
-                        + sessionAttributes[KEY_CURRENT_CATEGORY] + " department";
-                }
-                current = current + 1;
-            }
-        }
+//     if (current) {
+//         // Iterate through the session attributes to create the next n results for the user.
+//         for (var i = 0; i < PAGINATION_SIZE; i++) {
+//             if (sessionAttributes[current]) {
+//                 var numberInList = current + 1;
+//                 if (current < MAX_ITEMS - 1) {
+//                     speechText += "<say-as interpret-as=\"ordinal\">" + numberInList + "</say-as>. "
+//                         + sessionAttributes[current] + ". ";
+//                 } else {
+//                     speechText += "And the <say-as interpret-as=\"ordinal\">" + numberInList + "</say-as> top seller is. "
+//                         + sessionAttributes[current] + ". Those were the 10 top sellers in Amazon's "
+//                         + sessionAttributes[KEY_CURRENT_CATEGORY] + " department";
+//                 }
+//                 current = current + 1;
+//             }
+//         }
 
-        // Set the new index and end the session if the newIndex is greater than the MAX_ITEMS
-        sessionAttributes[KEY_CURRENT_INDEX] = current;
+//         // Set the new index and end the session if the newIndex is greater than the MAX_ITEMS
+//         sessionAttributes[KEY_CURRENT_INDEX] = current;
 
-        if (current < MAX_ITEMS) {
-            speechText += " Would you like to hear more?";
+//         if (current < MAX_ITEMS) {
+//             speechText += " Would you like to hear more?";
 
-            speechOutput = {
-                speech: '<speak>' + speechText + '</speak>',
-                type: AlexaSkill.speechOutputType.SSML
-            };
-            repromptOutput = {
-                speech: speechText,
-                type: AlexaSkill.speechOutputType.PLAIN_TEXT
-            };
-            response.ask(speechOutput, repromptOutput);
-        } else {
-            speechOutput = {
-                speech: '<speak>' + speechText + '</speak>',
-                type: AlexaSkill.speechOutputType.SSML
-            };
-            response.tell(speechOutput);
-        }
-    } else {
-        // The user attempted to get more results without ever uttering the category.
-        // Reprompt the user for the proper usage.
-        speechText = "Welcome to the Savvy Consumer. For which category do you want to hear the best sellers?.";
-        var repromptText = "<speak> Please choose a category by saying, " +
-            "books <break time=\"0.2s\" />" +
-            "fashion <break time=\"0.2s\" /> " +
-            "movie <break time=\"0.2s\" /> " +
-            "kitchen </speak>";
-        speechOutput = {
-            speech: speechText,
-            type: AlexaSkill.speechOutputType.PLAIN_TEXT
-        };
-        repromptOutput = {
-            speech: repromptText,
-            type: AlexaSkill.speechOutputType.SSML
-        };
-        response.ask(speechOutput, repromptOutput);
-    }
-}
+//             speechOutput = {
+//                 speech: '<speak>' + speechText + '</speak>',
+//                 type: AlexaSkill.speechOutputType.SSML
+//             };
+//             repromptOutput = {
+//                 speech: speechText,
+//                 type: AlexaSkill.speechOutputType.PLAIN_TEXT
+//             };
+//             response.ask(speechOutput, repromptOutput);
+//         } else {
+//             speechOutput = {
+//                 speech: '<speak>' + speechText + '</speak>',
+//                 type: AlexaSkill.speechOutputType.SSML
+//             };
+//             response.tell(speechOutput);
+//         }
+//     } else {
+//         // The user attempted to get more results without ever uttering the category.
+//         // Reprompt the user for the proper usage.
+//         speechText = "Welcome to the Savvy Consumer. For which category do you want to hear the best sellers?.";
+//         var repromptText = "<speak> Please choose a category by saying, " +
+//             "books <break time=\"0.2s\" />" +
+//             "fashion <break time=\"0.2s\" /> " +
+//             "movie <break time=\"0.2s\" /> " +
+//             "kitchen </speak>";
+//         speechOutput = {
+//             speech: speechText,
+//             type: AlexaSkill.speechOutputType.PLAIN_TEXT
+//         };
+//         repromptOutput = {
+//             speech: repromptText,
+//             type: AlexaSkill.speechOutputType.SSML
+//         };
+//         response.ask(speechOutput, repromptOutput);
+//     }
+// }
 
 /**
  * Gets the lookup word based on the input category slot. The lookup word will be from the BROWSE_NODE_MAP and will
@@ -428,6 +428,6 @@ function helpTheUser(intent, session, response) {
 
 // Create the handler that responds to the Alexa Request.
 exports.handler = function (event, context) {
-    var SeptaSchedules = new SeptaSchedules();
-    SeptaSchedules.execute(event, context);
+    var skill = new SeptaSchedules();
+    skill.execute(event, context);
 };
