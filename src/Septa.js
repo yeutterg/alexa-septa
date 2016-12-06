@@ -13,7 +13,7 @@
 var http = require('http');
 
 var baseUrl = 'www3.septa.org';
-var basePath = '/hackathon/';
+var basePath = '/hackathon';
 var resultQty = 9;  // The number of results to request in a query
 
 // Test function
@@ -113,6 +113,7 @@ function getBusTrolleySchedule(routeNumber, lat, lng, dir, schedule) {
  * @callback callback The JSON response callback, null if error
  */
 function httpGet(requestHost, requestPath, callback) {
+    console.log('Request: ' + requestHost + requestPath);
     return http.get({
         host: requestHost,
         path: requestPath
@@ -153,3 +154,9 @@ function time24H(amPmTime, callback) {
     obj['mm'] = mm;
     callback(obj);
 }
+
+// Make functions available externally
+module.exports = {
+    getClosestStopId: getClosestStopId,
+    getBusTrolleySchedule: getBusTrolleySchedule
+};
