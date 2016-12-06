@@ -147,7 +147,7 @@ function time24H(amPmTime, callback) {
         mm = parseInt(amPmTime.substring(3,5)); 
     }
 
-    if (amPmTime.includes('p')) hh += 12; // if PM, add 12
+    // if (amPmTime.includes('p')) hh += 12; // if PM, add 12
 
     var obj = {};
     obj['hh'] = hh;
